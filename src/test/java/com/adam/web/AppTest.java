@@ -18,8 +18,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.Random;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -31,13 +30,15 @@ public class AppTest {
     private MockMvc mockMvc;
 
     @Before
-    public void setup() throws Exception {
+    public void setup() {
 
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
     }
 
     @Test
     public void getWebSiteGreeting() throws Exception {
+
+        //GET Test
         MvcResult mvcResultGet = this.mockMvc.perform(get("/greetings/1"))
                 .andReturn();
         String contentAsStringGET = mvcResultGet.getResponse().getContentAsString();
@@ -56,14 +57,11 @@ public class AppTest {
         assertEquals("Greetings from Spring Boot!", contentAsStringGET);
 
 
-
-
+        //POST test
         MvcResult mvcResultPost = this.mockMvc.perform(post("/greetings")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"id\":"+ 3+", \"message\": \"Lulz, this sucks\"}"))
+                .content("{\"id\":" + 3 + ", \"message\": \"Lulz, this sucks\"}"))
                 .andReturn();
-
-
 
         assertEquals(201, mvcResultPost.getResponse().getStatus());
 
@@ -72,5 +70,32 @@ public class AppTest {
         contentAsStringGET = mvcResultGet.getResponse().getContentAsString();
 
         assertEquals("Lulz, this sucks", contentAsStringGET);
+
+        //PUT Test
+        MvcResult mvcResultPut = this.mockMvc.perform(put("/greetings/3")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"message\": \"J/k, this rules!\"}"))
+                .andReturn();
+
+        assertEquals(204, mvcResultPut.getResponse().getStatus());
+
+        mvcResultGet = this.mockMvc.perform(get("/greetings/3"))
+                .andReturn();
+        contentAsStringGET = mvcResultGet.getResponse().getContentAsString();
+
+        assertEquals("J/k, this rules!", contentAsStringGET);
+        //PUT Update Test
+        mvcResultPut = this.mockMvc.perform(put("/greetings/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"message\": \"This is now my first message!\"}"))
+                .andReturn();
+
+        assertEquals(204, mvcResultPut.getResponse().getStatus());
+
+        mvcResultGet = this.mockMvc.perform(get("/greetings/1"))
+                .andReturn();
+        contentAsStringGET = mvcResultGet.getResponse().getContentAsString();
+
+        assertEquals("This is now my first message!", contentAsStringGET);
     }
 }

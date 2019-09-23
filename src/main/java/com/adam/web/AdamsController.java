@@ -7,18 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 
 @RestController
@@ -43,6 +39,17 @@ public class AdamsController {
         this.websiteGreeting.add(websiteGreeting2);
     }
 
+
+
+
+
+
+
+
+
+
+
+
     @RequestMapping(value = "/greetings/{id}",method = GET)
     public String getWebSiteGreeting(@PathVariable int id) {
 
@@ -54,10 +61,69 @@ public class AdamsController {
         return "Greetings from Spring Boot!";
     }
 
-    @RequestMapping(value = "/greetings",method = POST)
+    @RequestMapping(value = "/greetings",method = GET)
+    public List<WebsiteGreeting> searchWebSiteGreeting(@RequestParam("contains") String contains) {
+
+        List<WebsiteGreeting> messagesToReturn = new ArrayList<>();
+        for(WebsiteGreeting websiteGreeting1 : this.websiteGreeting) {
+            if (websiteGreeting1.getMessage().contains(contains) || websiteGreeting1.getMessage().contains(contains.toLowerCase())) {
+                messagesToReturn.add(websiteGreeting1);
+            }
+        }
+        return messagesToReturn;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @RequestMapping(value = "/greetings", method = POST)
     public ResponseEntity createWebSiteGreeting(@RequestBody WebsiteGreeting websiteGreetingObject) throws IOException {
         websiteGreeting.add(websiteGreetingObject);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @RequestMapping(value = "/greetings/{id}", method = PUT)
+    public ResponseEntity updateWebSiteGreeting(@PathVariable int id, @RequestBody WebsiteGreeting websiteGreetingObject)  {
+        for(WebsiteGreeting websiteGreeting1 : this.websiteGreeting) {
+            if (websiteGreeting1.getId() == id) {
+                websiteGreeting1.setMessage(websiteGreetingObject.getMessage());
+            }
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }
